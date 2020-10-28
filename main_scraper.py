@@ -40,6 +40,9 @@ num = 0
 
 #Create empty lists to hold results 
 
+titles = []
+shop_names = []
+is_ad = []
 
 #Loop through the scraping code until we get 6000 records
 
@@ -49,17 +52,29 @@ while record_counter < 10:
 
     try:
         main = WebDriverWait(driver, 10).until(
-            EC.presence_of_element_located((By.CLASS_NAME, 'bg-white display-blick pb-xs-2 mt-xs-0')))
-
-    
+            EC.presence_of_element_located((By.ID, 'content')))
+        
         #Get the listing containers and loop through them
         
-        print('test')
+        results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')
+                
+        for result in results: 
+            
+            title = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
+            titles.append(title)
         
-        results = main.find_elements_by_class_name("wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item-lg-3 wt-order-xs-0 wt-order-sm-0 wt-order-md-0 wt-order-lg-0 wt-order-xl-0 wt-order-tv-0 grid__item-xl-fifth tab-reorder")
+            shop_name = result.find_element_by_css_selector("p.screen-reader-only").text
+            if shop_name[:2] == 'Ad':
+                is_ad.append(1)
+            else:
+                is_ad.append(0)
+            shop_names.append(shop_name.split(" ")[-1])
+            
         
-        for result in results:
-            print(len(result))
+        print(shop_names)
+        print(is_ad)
+        print(titles)
+                
         #Loop over each vacancy 
     
         # for result in results:
