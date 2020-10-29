@@ -45,6 +45,9 @@ is_ad = []
 star_ratings = []
 num_reviews = []
 prices = []
+free_uk = []
+bestseller = []
+discounted = []
 
 #Loop through the scraping code until we get 6000 records
 
@@ -82,13 +85,24 @@ try:
         
         price = result.find_element_by_css_selector('span.currency-value').text
         prices.append(price)
-    
-    print(shop_names)
-    print(is_ad)
-    print(titles)
-    print(star_ratings)
-    print(num_reviews)
-    print(prices)
+        
+        #Initialize an empty list to hold links to each job search result 
+        
+        link_list = []
+        
+        #Find links for each job posted and append them to our links list 
+        
+        links = driver.find_elements_by_xpath("//div[@class='js-merch-stash-check-listing  v2-listing-card position-relative flex-xs-none ']/a[1]")
+        
+        for link in links:
+            link_text = link.get_attribute("href")
+            link_list.append(link_text)
+        
+        #Loop over links and get pertinent information
+        print(link_list)
+        
+        for link in link_list:
+            driver.get(link)
 
 finally: 
                 
