@@ -8,6 +8,7 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.common.keys import Keys
 import time
 
 import pandas as pd 
@@ -45,9 +46,19 @@ is_ad = []
 star_ratings = []
 num_reviews = []
 prices = []
-free_uk = []
-bestseller = []
-discounted = []
+# free_uk = []
+# bestseller = []
+# discounted = []
+
+local_seller = []
+num_sales = []
+in_basket = []
+descriptions = []
+est_arrival = []
+cost_delivery = []
+returns_accepted = []
+dispatch_from = []
+count_images = []
 
 #Loop through the scraping code until we get 6000 records
 
@@ -92,18 +103,37 @@ try:
         
         #Find links for each job posted and append them to our links list 
         
-        links = driver.find_elements_by_xpath("//div[@class='js-merch-stash-check-listing  v2-listing-card position-relative flex-xs-none ']/a[1]")
+        links = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]/a[1]")
         
         for link in links:
             link_text = link.get_attribute("href")
             link_list.append(link_text)
         
         #Loop over links and get pertinent information
-        print(link_list)
         
         for link in link_list:
             driver.get(link)
+            
+            try:
+                loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
 
+            
+                local = loaded.find_elements_by_css_selector('span.wt-text-caption.wt-nudge-r-2')
+                if not local: local_seller.append(0)
+                else: local_seller.append(1)
+                
+                sales = loaded.find_elements_by_xpath("//a[@class='wt-text-link-no-underline wt-display-inline-flex-xs wt-align-items-center']/span[2]")
+                for x in sales:
+                    conv_x = x.text
+                    num_sales.append(conv_x.split(" ")[0])
+                
+                driver.back()
+                wait = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'content')))
+            except:
+                break
+        
+        print(num_sales)
+        
 finally: 
                 
     driver.quit()
