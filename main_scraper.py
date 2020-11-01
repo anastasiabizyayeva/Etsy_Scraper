@@ -52,7 +52,7 @@ prices = []
 
 local_seller = []
 num_sales = []
-in_basket = []
+num_basket = []
 descriptions = []
 est_arrival = []
 cost_delivery = []
@@ -118,7 +118,7 @@ try:
                 loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
 
             
-                local = loaded.find_elements_by_css_selector('span.wt-text-caption.wt-nudge-r-2')
+                local = loaded.find_elements_by_xpath("//*[contains(text(), 'Local seller')]")
                 if not local: local_seller.append(0)
                 else: local_seller.append(1)
                 
@@ -127,13 +127,24 @@ try:
                     conv_x = x.text
                     num_sales.append(conv_x.split(" ")[0])
                 
+                basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
+                if not basket: num_basket.append(0)
+                else: [num_basket.append(s) for s in basket.split() if s.isdigit()]
+                
+                
+                description = loaded.find_elements_by_css_selector('p.wt-text-body-01.wt-break-word')
+                for x in description:
+                    descriptions.append(x)
+                
                 driver.back()
                 wait = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'content')))
             except:
                 break
         
-        print(num_sales)
-        
+    print(titles)
+    print(descriptions)
+    print(num_basket)
+    
 finally: 
                 
     driver.quit()
