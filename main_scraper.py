@@ -129,7 +129,9 @@ try:
                 
                 basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
                 if not basket: num_basket.append(0)
-                else: [num_basket.append(s) for s in basket.split() if s.isdigit()]
+                else: x = basket[0].text
+                y = [int(i) for i in x.split() if i.isdigit()]
+                num_basket.append(y)
                 
                 
                 description = loaded.find_elements_by_css_selector('p.wt-text-body-01.wt-break-word')
@@ -144,6 +146,8 @@ try:
     print(titles)
     print(descriptions)
     print(num_basket)
+    print(num_sales)
+    print(local_seller)
     
 finally: 
                 
