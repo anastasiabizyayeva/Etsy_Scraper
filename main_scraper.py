@@ -49,7 +49,6 @@ num_reviews = []
 prices = []
 bestseller = []
 
-local_seller = []
 num_sales = []
 num_basket = []
 descriptions = []
@@ -61,7 +60,7 @@ count_images = []
 
 #Loop through the scraping code until we get 6000 records
 
-while page_counter < 2:
+while page_counter < 5:
         
         #Ensure main search results populate before further action is taken
     
@@ -126,19 +125,12 @@ while page_counter < 2:
             loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
             
             try:
-                local = loaded.find_elements_by_xpath("//*[contains(text(), 'Local seller')]")
-                local_seller.append(1)
+                sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
+                s = sales[0].text
+                num_sales.append(s.split(" ")[0])
             except:
-                local_seller.append(0)
-            
-            try:
-                sales = loaded.find_elements_by_xpath("//div[@class='wt-display-inline-flex-xs wt-align-items-center wt-mb-xs-3 wt-flex-wrap']/a/span[1]")
-                for x in sales:
-                    conv_x = x.text
-                    num_sales.append(conv_x.split(" ")[0])
-            except:
-                num_sales.append(np.nan)
-            
+                num_sales.append(0)
+                        
             try:
                 basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
                 x = basket[0].text
@@ -209,7 +201,6 @@ while page_counter < 2:
         print(len(num_reviews))
         print(len(prices))
         
-        print(len(local_seller))
         print(len(num_sales))
         print(len(num_basket))
         print(len(descriptions))
@@ -230,7 +221,7 @@ driver.quit()
 
 
 
-data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Local_Seller': local_seller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Est_Arrival': est_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images}
+data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Est_Arrival': est_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images}
 
 #Create dataframe from our dictionary  
             
