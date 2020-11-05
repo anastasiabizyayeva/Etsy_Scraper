@@ -61,7 +61,7 @@ count_images = []
 
 #Loop through the scraping code until we get 6000 records
 
-while page_counter < 4:
+while page_counter < 2:
         
         #Ensure main search results populate before further action is taken
     
@@ -101,7 +101,7 @@ while page_counter < 4:
             prices.append(price)
                 
             try:    
-                b_seller = result.find_element_by_xpath("//*[contains(text(), 'Bestseller')]")
+                b_seller = result.find_element_by_xpath("//span[@class='wt-badge wt-badge--small wt-badge--status-03']/span[2]")
                 bestseller.append(1)
             except:
                 bestseller.append(np.nan)  
@@ -118,7 +118,6 @@ while page_counter < 4:
             link_text = link.get_attribute("href")
             link_list.append(link_text)
         
-        print(len(link_list))
         #Loop over links and get pertinent information
         
         for link in link_list:
@@ -133,7 +132,7 @@ while page_counter < 4:
                 local_seller.append(0)
             
             try:
-                sales = loaded.find_elements_by_xpath("//a[@class='wt-text-link-no-underline wt-display-inline-flex-xs wt-align-items-center']/span[2]")
+                sales = loaded.find_elements_by_xpath("//div[@class='wt-display-inline-flex-xs wt-align-items-center wt-mb-xs-3 wt-flex-wrap']/a/span[1]")
                 for x in sales:
                     conv_x = x.text
                     num_sales.append(conv_x.split(" ")[0])
@@ -196,14 +195,29 @@ while page_counter < 4:
         #Get the listing containers and loop through them
         main = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, 'content')))
-        
-        
-            
+                    
         print('Finished scraping page ' + str(page_counter + 1))
         print('Scraped ' + str(record_counter) + ' records')
         print(len(count_images) == record_counter)
             
         page_counter += 1
+        
+        print(len(titles))
+        print(len(shop_names))
+        print(len(is_ad))
+        print(len(star_ratings))
+        print(len(num_reviews))
+        print(len(prices))
+        
+        print(len(local_seller))
+        print(len(num_sales))
+        print(len(num_basket))
+        print(len(descriptions))
+        print(len(est_arrival))
+        print(len(cost_delivery))
+        print(len(returns_accepted))
+        print(len(dispatch_from))
+        print(len(count_images))
         
         page = driver.find_element_by_xpath('//a[contains(@href,"https://www.etsy.com/uk/search?q=birthday+card&ref=pagination&page={}")]'.format(1+page_counter))
         next_page = page.get_attribute("href")
@@ -213,3 +227,15 @@ while page_counter < 4:
         break
 
 driver.quit()
+
+
+
+data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Local_Seller': local_seller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Est_Arrival': est_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images}
+
+#Create dataframe from our dictionary  
+            
+df = pd.DataFrame(data)
+
+#Save dataframe to a new CSV 
+
+df.to_csv('raw_data.csv')
