@@ -47,9 +47,7 @@ is_ad = []
 star_ratings = []
 num_reviews = []
 prices = []
-# free_uk = []
-# bestseller = []
-# discounted = []
+bestseller = []
 
 local_seller = []
 num_sales = []
@@ -146,16 +144,17 @@ try:
         except:
             dispatch_from.append(np.nan)
         
+        try:
+            images = loaded.find_element_by_xpath("//ul[starts-with(@class, 'wt-list-unstyled wt-display-flex-xs')]")
+            i_list = images.find_elements_by_xpath("//li[@class='wt-mr-xs-1 wt-mb-xs-1 wt-bg-gray wt-flex-shrink-xs-0 wt-rounded carousel-pagination-item-v2']")
+            count_images.append(len(i_list))
+        except:
+            count_images.append(1)
+        
         driver.back()
         
         wait = WebDriverWait(driver, 10).until(
     EC.presence_of_element_located((By.ID, 'content')))
-    
-    print(est_arrival)
-    print(num_basket)
-    print(cost_delivery)
-    print(returns_accepted)
-    print(dispatch_from)
     
     #Get the listing containers and loop through them
     main = WebDriverWait(driver, 10).until(
@@ -177,16 +176,29 @@ try:
             is_ad.append(0)
         shop_names.append(shop_name.split(" ")[-1])
         
-        star_rating = result.find_element_by_css_selector("span.screen-reader-only").text
-        star_ratings.append(star_rating.split(" ")[0])
+        try:
+            star_rating = result.find_element_by_css_selector("span.screen-reader-only").text
+            star_ratings.append(star_rating.split(" ")[0])
+        except:
+            star_ratings.append(np.nan)
         
-        num_review = result.find_element_by_css_selector('span.text-body-smaller.text-gray-lighter.display-inline-block.icon-b-1').text
-        num_reviews.append(num_review.strip("()"))
+        try:
+            num_review = result.find_element_by_css_selector('span.text-body-smaller.text-gray-lighter.display-inline-block.icon-b-1').text
+            num_reviews.append(num_review.strip("()"))
+        except:
+            num_reviews.append(0)
         
         price = result.find_element_by_css_selector('span.currency-value').text
         prices.append(price)
-        
+            
+        try:    
+            b_seller = result.find_element_by_xpath("//*[contains(text(), 'Bestseller')]")
+            bestseller.append(1)
+        except:
+            bestseller.append(np.nan)   
     
+    next_page = driver.find_element_by_xpath("//ul[@class='pagination']//li[{}]".format(2+num))
+    next_page.click()
 finally: 
                 
     driver.quit()
