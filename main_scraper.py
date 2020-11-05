@@ -88,54 +88,68 @@ try:
     
     for link in link_list:
         driver.get(link)
+    
+        loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
         
         try:
-            loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
-
             local = loaded.find_elements_by_xpath("//*[contains(text(), 'Local seller')]")
-            if not local: local_seller.append(0)
-            else: local_seller.append(1)
-            
+            local_seller.append(1)
+        except:
+            local_seller.append(0)
+        
+        try:
             sales = loaded.find_elements_by_xpath("//a[@class='wt-text-link-no-underline wt-display-inline-flex-xs wt-align-items-center']/span[2]")
             for x in sales:
                 conv_x = x.text
                 num_sales.append(conv_x.split(" ")[0])
-            
+        except:
+            num_sales.append(np.nan)
+        
+        try:
             basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
-            if not basket: num_basket.append(0)
-            else: x = basket[0].text
+            x = basket[0].text
             y = [int(i) for i in x.split() if i.isdigit()]
             num_basket.append(y)
-            
+        except:
+            num_basket.append(0)
+        
+        try:
             description = loaded.find_element_by_xpath("//meta[@name='description']")
             descriptions.append(description.get_attribute("content"))
-            
+        except:
+            descriptions.append(np.nan)
+        
+        try:
             est = loaded.find_element_by_xpath("//*[contains(text(), 'Estimated arrival')]")
-            if not est: est_arrival.append(np.nan)
-            else: arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
+            arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
             est_arrival.append(arrival.text)
-            
+        except:
+            est_arrival.append(np.nan)
+        
+        try:
             delivery = loaded.find_element_by_xpath("//*[contains(text(), 'Cost to deliver')]/following-sibling::p").text
-            if not delivery: cost_delivery.append(np.nan)
-            else: cost_delivery.append(delivery)
-            
+            cost_delivery.append(delivery)
+        except:
+            cost_delivery.append(np.nan)
+        
+        try:
             returns = loaded.find_element_by_xpath("//*[contains(text(), 'Accepted')]")
-            if not returns: returns_accepted.append(0)
-            else: returns_accepted.append(1)
-            
+            returns_accepted.append(1)
+        except:
+            returns_accepted.append(0)
+        
+        try:
             dispatch = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[7]").text
-            if not dispatch: dispatch_from.append(np.nan)
-            else: d_split = dispatch.split(" ")[2:]
+            d_split = dispatch.split(" ")[2:]
             d_join = " ".join(d_split)
             dispatch_from.append(d_join)
-            
-            driver.back()
-            
-            wait = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, 'content')))
-            
         except:
-            break
+            dispatch_from.append(np.nan)
+        
+        driver.back()
+        
+        wait = WebDriverWait(driver, 10).until(
+    EC.presence_of_element_located((By.ID, 'content')))
     
     print(est_arrival)
     print(num_basket)
