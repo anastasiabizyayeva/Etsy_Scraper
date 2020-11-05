@@ -12,6 +12,7 @@ from selenium.webdriver.common.keys import Keys
 import time
 
 import pandas as pd 
+import numpy as np
 
 from scraper_functions import open_page
 
@@ -70,7 +71,81 @@ try:
     main = WebDriverWait(driver, 10).until(
         EC.presence_of_element_located((By.ID, 'content')))
     
+     #Initialize an empty list to hold links to each job search result 
+        
+    link_list = []
+    
+    #Find links for each job posted and append them to our links list 
+    
+    links = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]/a[1]")
+    
+    for link in links:
+        link_text = link.get_attribute("href")
+        link_list.append(link_text)
+    
+    print(len(link_list))
+    #Loop over links and get pertinent information
+    
+    for link in link_list:
+        driver.get(link)
+        
+        try:
+            loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
+
+            local = loaded.find_elements_by_xpath("//*[contains(text(), 'Local seller')]")
+            if not local: local_seller.append(0)
+            else: local_seller.append(1)
+            
+            sales = loaded.find_elements_by_xpath("//a[@class='wt-text-link-no-underline wt-display-inline-flex-xs wt-align-items-center']/span[2]")
+            for x in sales:
+                conv_x = x.text
+                num_sales.append(conv_x.split(" ")[0])
+            
+            basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
+            if not basket: num_basket.append(0)
+            else: x = basket[0].text
+            y = [int(i) for i in x.split() if i.isdigit()]
+            num_basket.append(y)
+            
+            description = loaded.find_element_by_xpath("//meta[@name='description']")
+            descriptions.append(description.get_attribute("content"))
+            
+            est = loaded.find_element_by_xpath("//*[contains(text(), 'Estimated arrival')]")
+            if not est: est_arrival.append(np.nan)
+            else: arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
+            est_arrival.append(arrival.text)
+            
+            delivery = loaded.find_element_by_xpath("//*[contains(text(), 'Cost to deliver')]/following-sibling::p").text
+            if not delivery: cost_delivery.append(np.nan)
+            else: cost_delivery.append(delivery)
+            
+            returns = loaded.find_element_by_xpath("//*[contains(text(), 'Accepted')]")
+            if not returns: returns_accepted.append(0)
+            else: returns_accepted.append(1)
+            
+            dispatch = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[7]").text
+            if not dispatch: dispatch_from.append(np.nan)
+            else: d_split = dispatch.split(" ")[2:]
+            d_join = " ".join(d_split)
+            dispatch_from.append(d_join)
+            
+            driver.back()
+            
+            wait = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, 'content')))
+            
+        except:
+            break
+    
+    print(est_arrival)
+    print(num_basket)
+    print(cost_delivery)
+    print(returns_accepted)
+    print(dispatch_from)
+    
     #Get the listing containers and loop through them
+    main = WebDriverWait(driver, 10).until(
+        EC.presence_of_element_located((By.ID, 'content')))
     
     results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
     
@@ -97,57 +172,6 @@ try:
         price = result.find_element_by_css_selector('span.currency-value').text
         prices.append(price)
         
-        #Initialize an empty list to hold links to each job search result 
-        
-        link_list = []
-        
-        #Find links for each job posted and append them to our links list 
-        
-        links = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]/a[1]")
-        
-        for link in links:
-            link_text = link.get_attribute("href")
-            link_list.append(link_text)
-        
-        #Loop over links and get pertinent information
-        
-        for link in link_list:
-            driver.get(link)
-            
-            try:
-                loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
-
-            
-                local = loaded.find_elements_by_xpath("//*[contains(text(), 'Local seller')]")
-                if not local: local_seller.append(0)
-                else: local_seller.append(1)
-                
-                sales = loaded.find_elements_by_xpath("//a[@class='wt-text-link-no-underline wt-display-inline-flex-xs wt-align-items-center']/span[2]")
-                for x in sales:
-                    conv_x = x.text
-                    num_sales.append(conv_x.split(" ")[0])
-                
-                basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
-                if not basket: num_basket.append(0)
-                else: x = basket[0].text
-                y = [int(i) for i in x.split() if i.isdigit()]
-                num_basket.append(y)
-                
-                
-                description = loaded.find_elements_by_css_selector('p.wt-text-body-01.wt-break-word')
-                for x in description:
-                    descriptions.append(x)
-                
-                driver.back()
-                wait = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, 'content')))
-            except:
-                break
-        
-    print(titles)
-    print(descriptions)
-    print(num_basket)
-    print(num_sales)
-    print(local_seller)
     
 finally: 
                 
