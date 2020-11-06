@@ -8,8 +8,6 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-from selenium.webdriver.common.keys import Keys
-import time
 
 import pandas as pd 
 import numpy as np
@@ -60,7 +58,7 @@ count_images = []
 
 #Loop through the scraping code until we get 6000 records
 
-while page_counter < 5:
+while page_counter < 240:
         
         #Ensure main search results populate before further action is taken
     
@@ -219,13 +217,13 @@ while page_counter < 5:
 
 driver.quit()
 
-
-
 data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Est_Arrival': est_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images}
 
 #Create dataframe from our dictionary  
             
 df = pd.DataFrame(data)
+df['Shop_Name'] = df['Shop_Name'].astype('category').cat.codes
+df['Category'] = 'Valentine'
 
 #Save dataframe to a new CSV 
 
