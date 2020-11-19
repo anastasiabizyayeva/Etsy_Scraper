@@ -66,43 +66,6 @@ while page_counter < 240:
         main = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, 'content')))
         
-        results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
-        
-        record_counter += len(results)
-                
-        for result in results: 
-            
-            title = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
-            titles.append(title)
-        
-            shop_name = result.find_element_by_css_selector("p.screen-reader-only").text
-            if shop_name[:2] == 'Ad':
-                is_ad.append(1)
-            else:
-                is_ad.append(0)
-            shop_names.append(shop_name.split(" ")[-1])
-            
-            try:
-                star_rating = result.find_element_by_css_selector("span.screen-reader-only").text
-                star_ratings.append(star_rating.split(" ")[0])
-            except:
-                star_ratings.append(np.nan)
-            
-            try:
-                num_review = result.find_element_by_css_selector('span.text-body-smaller.text-gray-lighter.display-inline-block.icon-b-1').text
-                num_reviews.append(num_review.strip("()"))
-            except:
-                num_reviews.append(0)
-            
-            price = result.find_element_by_css_selector('span.currency-value').text
-            prices.append(price)
-                
-            try:    
-                b_seller = result.find_element_by_xpath("//span[@class='wt-badge wt-badge--small wt-badge--status-03']/span[2]")
-                bestseller.append(1)
-            except:
-                bestseller.append(np.nan)  
-        
         #Initialize an empty list to hold links to each job search result 
             
         link_list = []
@@ -179,12 +142,49 @@ while page_counter < 240:
             
             driver.back()
             
-            wait = WebDriverWait(driver, 10).until(
-        EC.presence_of_element_located((By.ID, 'content')))
+            #wait = WebDriverWait(driver, 10).until(
+        #EC.presence_of_element_located((By.ID, 'content')))
         
         #Get the listing containers and loop through them
         main = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, 'content')))
+        
+        results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
+        
+        record_counter += len(results)
+                
+        for result in results: 
+            
+            title = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
+            titles.append(title)
+        
+            shop_name = result.find_element_by_css_selector("p.screen-reader-only").text
+            if shop_name[:2] == 'Ad':
+                is_ad.append(1)
+            else:
+                is_ad.append(0)
+            shop_names.append(shop_name.split(" ")[-1])
+            
+            try:
+                star_rating = result.find_element_by_css_selector("span.screen-reader-only").text
+                star_ratings.append(star_rating.split(" ")[0])
+            except:
+                star_ratings.append(np.nan)
+            
+            try:
+                num_review = result.find_element_by_css_selector('span.text-body-smaller.text-gray-lighter.display-inline-block.icon-b-1').text
+                num_reviews.append(num_review.strip("()"))
+            except:
+                num_reviews.append(0)
+            
+            price = result.find_element_by_css_selector('span.currency-value').text
+            prices.append(price)
+                
+            try:    
+                b_seller = result.find_element_by_xpath("//span[@class='wt-badge wt-badge--small wt-badge--status-03']/span[2]")
+                bestseller.append(1)
+            except:
+                bestseller.append(np.nan)  
                     
         print('Finished scraping page ' + str(page_counter + 1))
         print('Scraped ' + str(record_counter) + ' records')
