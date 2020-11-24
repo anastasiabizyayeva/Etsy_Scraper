@@ -13,10 +13,10 @@ import pandas as pd
 import numpy as np
 
 from scraper_functions import open_page
+from scraper_options import PATH
 
 #Establish path to Chromedriver
 
-PATH = "C:/Program Files (x86)\chromedriver.exe"
 driver = webdriver.Chrome(PATH)
 
 #Establish connection to URL
