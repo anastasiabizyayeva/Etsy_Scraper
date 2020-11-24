@@ -14,8 +14,6 @@ from selenium.webdriver.support import expected_conditions as EC
 import time 
 import re 
 
-from scraper_options import search_terms
-
 import pandas as pd 
 import numpy as np 
 

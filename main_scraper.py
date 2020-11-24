@@ -12,14 +12,16 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd 
 import numpy as np
 
-from scraper_functions import open_page
-from scraper_options import PATH
+from scraper_functions import open_page, get_url_list
+from scraper_options import PATH, search_terms
 
 #Establish path to Chromedriver
 
 driver = webdriver.Chrome(PATH)
 
-#Establish connection to URL
+#Establish connection to URLs
+
+urls = get_url_list(search_terms)
 
 URL = "https://www.etsy.com/uk/search?q=birthday%20card"
 
