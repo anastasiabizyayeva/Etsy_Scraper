@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd 
 import numpy as np
 
-from scraper_functions import open_page, get_url_list, get_links, scrape_link_details
+from scraper_functions import open_page, get_url_list, get_links, scrape_link_details, get_main_page
 from scraper_options import PATH, search_terms
 
 #Establish path to Chromedriver
@@ -95,38 +95,13 @@ while page_counter < 240:
         record_counter += len(results)
                 
         for result in results: 
-            
-            title = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
-            titles.append(title)
-        
-            shop_name = result.find_element_by_css_selector("p.screen-reader-only").text
-            if shop_name[:2] == 'Ad':
-                is_ad.append(1)
-            else:
-                is_ad.append(0)
-            shop_names.append(shop_name.split(" ")[-1])
-            
-            try:
-                star_rating = result.find_element_by_css_selector("span.screen-reader-only").text
-                star_ratings.append(star_rating.split(" ")[0])
-            except:
-                star_ratings.append(np.nan)
-            
-            try:
-                num_review = result.find_element_by_css_selector('span.text-body-smaller.text-gray-lighter.display-inline-block.icon-b-1').text
-                num_reviews.append(num_review.strip("()"))
-            except:
-                num_reviews.append(0)
-            
-            price = result.find_element_by_css_selector('span.currency-value').text
-            prices.append(price)
                 
-            try:    
-                b_seller = result.find_element_by_xpath("//span[@class='wt-badge wt-badge--small wt-badge--status-03']/span[2]")
-                bestseller.append(1)
-            except:
-                bestseller.append(np.nan)  
-                    
+            info = get_main_page(driver, result)
+            info_list = [titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller]
+            
+            for x, lst in zip(info, info_list):
+                lst.append(x)
+  
         print('Finished scraping page ' + str(page_counter + 1))
         print('Scraped ' + str(record_counter) + ' records')
         print(len(count_images) == record_counter)

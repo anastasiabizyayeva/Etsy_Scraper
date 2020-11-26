@@ -105,4 +105,37 @@ def scrape_link_details(driver,link):
         count_images = 1
     
      return num_sales, num_basket, descriptions, est_arrival, cost_delivery, returns_accepted, dispatch_from, count_images
+
+def get_main_page(driver, result):
+    
+        titles = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
+        
+        shop_name = result.find_element_by_css_selector("p.screen-reader-only").text
+        if shop_name[:2] == 'Ad':
+            is_ad = 1
+        else:
+            is_ad = 0
+        shop_names = shop_name.split(" ")[-1]
+        
+        try:
+            star_rating = result.find_element_by_css_selector("span.screen-reader-only").text
+            star_ratings = star_rating.split(" ")[0]
+        except:
+            star_ratings = np.nan
+        
+        try:
+            num_review = result.find_element_by_css_selector('span.text-body-smaller.text-gray-lighter.display-inline-block.icon-b-1').text
+            num_reviews = num_review.strip("()")
+        except:
+            num_reviews = 0
+        
+        prices = result.find_element_by_css_selector('span.currency-value').text
+            
+        try:    
+            result.find_element_by_xpath("//span[@class='wt-badge wt-badge--small wt-badge--status-03']/span[2]")
+            bestseller = 1
+        except:
+            bestseller = np.nan
+        
+        return titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller
     
