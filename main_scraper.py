@@ -27,7 +27,7 @@ urls = get_url_list(search_terms)
 # for url in urls:
 #     open_page(driver, url)
 
-URL = "https://www.etsy.com/uk/search?q=birthday%20card"
+URL = "https://www.etsy.com/uk/search?q=birthday+card"
 
 open_page(driver,URL)
 
@@ -39,7 +39,7 @@ open_page(driver,URL)
 
 #Initialize counts for page flipping and counting total records 
 
-page_counter = 0
+page_counter = 1
 record_counter = 0
 num = 0
 
@@ -64,12 +64,12 @@ count_images = []
 
 #Loop through the scraping code until we get 6000 records
 
-while page_counter < 240:
+while page_counter < 100:
         
         #Ensure main search results populate before further action is taken
     
     try:
-        main = WebDriverWait(driver, 10).until(
+        main = WebDriverWait(driver,5).until(
             EC.presence_of_element_located((By.ID, 'content')))
         
         link_list = get_links(driver)
@@ -86,50 +86,53 @@ while page_counter < 240:
             
             driver.back()
         
-        #Get the listing containers and loop through them
+        # Get the listing containers and loop through them
         main = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, 'content')))
-        
+
         results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
-        
+
         record_counter += len(results)
                 
-        for result in results: 
-                
-            info = get_main_page(driver, result)
-            info_list = [titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller]
+        for result in results:
             
-            for x, lst in zip(info, info_list):
-                lst.append(x)
+            try:
+                
+                info = get_main_page(driver, result)
+                info_list = [titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller]
+                
+                for x, lst in zip(info, info_list):
+                    lst.append(x)
+            except: 
+                break
   
-        print('Finished scraping page ' + str(page_counter + 1))
+        print('Finished scraping page ' + str(page_counter))
         print('Scraped ' + str(record_counter) + ' records')
-        print(len(count_images) == record_counter)
+        # print(len(count_images) == record_counter)
             
         page_counter += 1
         
-        print(len(titles))
-        print(len(shop_names))
-        print(len(is_ad))
-        print(len(star_ratings))
-        print(len(num_reviews))
-        print(len(prices))
+        # print(len(titles))
+        # print(len(shop_names))
+        # print(len(is_ad))
+        # print(len(star_ratings))
+        # print(num_reviews[70:100])
+        # print(len(prices))
         
-        print(len(num_sales))
-        print(len(num_basket))
-        print(len(descriptions))
-        print(len(est_arrival))
-        print(len(cost_delivery))
-        print(len(returns_accepted))
-        print(len(dispatch_from))
-        print(len(count_images))
-        
-        next_page(driver, page_counter)
-        
-        # page = driver.find_element_by_xpath('//a[contains(@href,"https://www.etsy.com/uk/search?q=birthday+card&ref=pagination&page={}")]'.format(1+page_counter))
-        # next_page = page.get_attribute("href")
-        # driver.get(next_page)
-    
+        # print(len(num_sales))
+        # print(len(num_basket))
+        # print(len(descriptions))
+        # print(len(est_arrival))
+        # print(len(cost_delivery))
+        # print(len(returns_accepted))
+        # print(len(dispatch_from))
+        # print(len(count_images))
+        try:
+            next_page(driver, page_counter)
+        except:
+            print('no next page')
+            break
+                
     except:
         break
 

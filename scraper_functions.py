@@ -140,7 +140,10 @@ def get_main_page(driver, result):
     return titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller
 
 def next_page(driver, page_counter):
-    page = driver.find_element_by_xpath('//a[contains(@href,"https://www.etsy.com/uk/search?q=birthday+card&ref=pagination&page={}")]'.format(1+page_counter))
-    next_page = page.get_attribute("href")
-    driver.get(next_page)
+    try:
+        page = driver.find_element_by_xpath('//a[contains(@data-page,"{}")]'.format(page_counter))
+        next_page = page.get_attribute("href")
+        driver.get(next_page)
+    except:
+        pass
     
