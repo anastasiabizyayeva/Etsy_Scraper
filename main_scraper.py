@@ -84,66 +84,6 @@ while page_counter < 240:
             for x, lst in zip(appenders, mylists):
                 lst.append(x)
             
-            
-            # driver.get(link)
-        
-            # loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
-
-            # try:
-            #     sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
-            #     s = sales[0].text
-            #     num_sales = s.split(" ")[0]
-            # except:
-            #     num_sales = 0
-                        
-            # try:
-            #     basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
-            #     x = basket[0].text
-            #     y = [int(i) for i in x.split() if i.isdigit()]
-            #     num_basket = y
-            # except:
-            #     num_basket.append(0)
-            
-            # try:
-            #     description = loaded.find_element_by_xpath("//meta[@name='description']")
-            #     descriptions.append(description.get_attribute("content"))
-            # except:
-            #     descriptions.append(np.nan)
-            
-            # try:
-            #     est = loaded.find_element_by_xpath("//*[contains(text(), 'Estimated arrival')]")
-            #     arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
-            #     est_arrival.append(arrival.text)
-            # except:
-            #     est_arrival.append(np.nan)
-            
-            # try:
-            #     delivery = loaded.find_element_by_xpath("//*[contains(text(), 'Cost to deliver')]/following-sibling::p").text
-            #     cost_delivery.append(delivery)
-            # except:
-            #     cost_delivery.append(np.nan)
-            
-            # try:
-            #     returns = loaded.find_element_by_xpath("//*[contains(text(), 'Accepted')]")
-            #     returns_accepted.append(1)
-            # except:
-            #     returns_accepted.append(0)
-            
-            # try:
-            #     dispatch = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[7]").text
-            #     d_split = dispatch.split(" ")[2:]
-            #     d_join = " ".join(d_split)
-            #     dispatch_from.append(d_join)
-            # except:
-            #     dispatch_from.append(np.nan)
-            
-            # try:
-            #     images = loaded.find_element_by_xpath("//ul[starts-with(@class, 'wt-list-unstyled wt-display-flex-xs')]")
-            #     i_list = images.find_elements_by_xpath("//li[@class='wt-mr-xs-1 wt-mb-xs-1 wt-bg-gray wt-flex-shrink-xs-0 wt-rounded carousel-pagination-item-v2']")
-            #     count_images.append(len(i_list))
-            # except:
-            #     count_images.append(1)
-            
             driver.back()
         
         #Get the listing containers and loop through them
