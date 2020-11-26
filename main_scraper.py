@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd 
 import numpy as np
 
-from scraper_functions import open_page, get_url_list
+from scraper_functions import open_page, get_url_list, get_links, scrape_link_details
 from scraper_options import PATH, search_terms
 
 #Establish path to Chromedriver
@@ -22,6 +22,10 @@ driver = webdriver.Chrome(PATH)
 #Establish connection to URLs
 
 urls = get_url_list(search_terms)
+
+# **WHEN EVERYTHING WORKS IMPLEMENT THIS CODE BELOW/ INDENT**
+# for url in urls:
+#     open_page(driver, url)
 
 URL = "https://www.etsy.com/uk/search?q=birthday%20card"
 
@@ -68,84 +72,79 @@ while page_counter < 240:
         main = WebDriverWait(driver, 10).until(
             EC.presence_of_element_located((By.ID, 'content')))
         
-        #Initialize an empty list to hold links to each job search result 
-            
-        link_list = []
-        
-        #Find links for each job posted and append them to our links list 
-        
-        links = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]/a[1]")
-        
-        for link in links:
-            link_text = link.get_attribute("href")
-            link_list.append(link_text)
+        link_list = get_links(driver)
         
         #Loop over links and get pertinent information
         
         for link in link_list:
-            driver.get(link)
+            
+            appenders = scrape_link_details(driver,link)
+            
+            mylists = [num_sales, num_basket, descriptions, est_arrival, cost_delivery, returns_accepted, dispatch_from, count_images]
+            for x, lst in zip(appenders, mylists):
+                lst.append(x)
+            
+            
+            # driver.get(link)
         
-            loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
-            
-            try:
-                sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
-                s = sales[0].text
-                num_sales.append(s.split(" ")[0])
-            except:
-                num_sales.append(0)
+            # loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
+
+            # try:
+            #     sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
+            #     s = sales[0].text
+            #     num_sales = s.split(" ")[0]
+            # except:
+            #     num_sales = 0
                         
-            try:
-                basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
-                x = basket[0].text
-                y = [int(i) for i in x.split() if i.isdigit()]
-                num_basket.append(y)
-            except:
-                num_basket.append(0)
+            # try:
+            #     basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
+            #     x = basket[0].text
+            #     y = [int(i) for i in x.split() if i.isdigit()]
+            #     num_basket = y
+            # except:
+            #     num_basket.append(0)
             
-            try:
-                description = loaded.find_element_by_xpath("//meta[@name='description']")
-                descriptions.append(description.get_attribute("content"))
-            except:
-                descriptions.append(np.nan)
+            # try:
+            #     description = loaded.find_element_by_xpath("//meta[@name='description']")
+            #     descriptions.append(description.get_attribute("content"))
+            # except:
+            #     descriptions.append(np.nan)
             
-            try:
-                est = loaded.find_element_by_xpath("//*[contains(text(), 'Estimated arrival')]")
-                arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
-                est_arrival.append(arrival.text)
-            except:
-                est_arrival.append(np.nan)
+            # try:
+            #     est = loaded.find_element_by_xpath("//*[contains(text(), 'Estimated arrival')]")
+            #     arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
+            #     est_arrival.append(arrival.text)
+            # except:
+            #     est_arrival.append(np.nan)
             
-            try:
-                delivery = loaded.find_element_by_xpath("//*[contains(text(), 'Cost to deliver')]/following-sibling::p").text
-                cost_delivery.append(delivery)
-            except:
-                cost_delivery.append(np.nan)
+            # try:
+            #     delivery = loaded.find_element_by_xpath("//*[contains(text(), 'Cost to deliver')]/following-sibling::p").text
+            #     cost_delivery.append(delivery)
+            # except:
+            #     cost_delivery.append(np.nan)
             
-            try:
-                returns = loaded.find_element_by_xpath("//*[contains(text(), 'Accepted')]")
-                returns_accepted.append(1)
-            except:
-                returns_accepted.append(0)
+            # try:
+            #     returns = loaded.find_element_by_xpath("//*[contains(text(), 'Accepted')]")
+            #     returns_accepted.append(1)
+            # except:
+            #     returns_accepted.append(0)
             
-            try:
-                dispatch = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[7]").text
-                d_split = dispatch.split(" ")[2:]
-                d_join = " ".join(d_split)
-                dispatch_from.append(d_join)
-            except:
-                dispatch_from.append(np.nan)
+            # try:
+            #     dispatch = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[7]").text
+            #     d_split = dispatch.split(" ")[2:]
+            #     d_join = " ".join(d_split)
+            #     dispatch_from.append(d_join)
+            # except:
+            #     dispatch_from.append(np.nan)
             
-            try:
-                images = loaded.find_element_by_xpath("//ul[starts-with(@class, 'wt-list-unstyled wt-display-flex-xs')]")
-                i_list = images.find_elements_by_xpath("//li[@class='wt-mr-xs-1 wt-mb-xs-1 wt-bg-gray wt-flex-shrink-xs-0 wt-rounded carousel-pagination-item-v2']")
-                count_images.append(len(i_list))
-            except:
-                count_images.append(1)
+            # try:
+            #     images = loaded.find_element_by_xpath("//ul[starts-with(@class, 'wt-list-unstyled wt-display-flex-xs')]")
+            #     i_list = images.find_elements_by_xpath("//li[@class='wt-mr-xs-1 wt-mb-xs-1 wt-bg-gray wt-flex-shrink-xs-0 wt-rounded carousel-pagination-item-v2']")
+            #     count_images.append(len(i_list))
+            # except:
+            #     count_images.append(1)
             
             driver.back()
-            
-            #wait = WebDriverWait(driver, 10).until(
-        #EC.presence_of_element_located((By.ID, 'content')))
         
         #Get the listing containers and loop through them
         main = WebDriverWait(driver, 10).until(
