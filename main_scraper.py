@@ -12,7 +12,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd 
 import numpy as np
 
-from scraper_functions import open_page, get_url_list, get_links, scrape_link_details, get_main_page
+from scraper_functions import open_page, get_url_list, get_links, scrape_link_details, get_main_page, next_page
 from scraper_options import PATH, search_terms
 
 #Establish path to Chromedriver
@@ -124,9 +124,11 @@ while page_counter < 240:
         print(len(dispatch_from))
         print(len(count_images))
         
-        page = driver.find_element_by_xpath('//a[contains(@href,"https://www.etsy.com/uk/search?q=birthday+card&ref=pagination&page={}")]'.format(1+page_counter))
-        next_page = page.get_attribute("href")
-        driver.get(next_page)
+        next_page(driver, page_counter)
+        
+        # page = driver.find_element_by_xpath('//a[contains(@href,"https://www.etsy.com/uk/search?q=birthday+card&ref=pagination&page={}")]'.format(1+page_counter))
+        # next_page = page.get_attribute("href")
+        # driver.get(next_page)
     
     except:
         break

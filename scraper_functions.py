@@ -108,34 +108,39 @@ def scrape_link_details(driver,link):
 
 def get_main_page(driver, result):
     
-        titles = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
+    titles = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
+    
+    shop_name = result.find_element_by_css_selector("p.screen-reader-only").text
+    if shop_name[:2] == 'Ad':
+        is_ad = 1
+    else:
+        is_ad = 0
+    shop_names = shop_name.split(" ")[-1]
+    
+    try:
+        star_rating = result.find_element_by_css_selector("span.screen-reader-only").text
+        star_ratings = star_rating.split(" ")[0]
+    except:
+        star_ratings = np.nan
+    
+    try:
+        num_review = result.find_element_by_css_selector('span.text-body-smaller.text-gray-lighter.display-inline-block.icon-b-1').text
+        num_reviews = num_review.strip("()")
+    except:
+        num_reviews = 0
+    
+    prices = result.find_element_by_css_selector('span.currency-value').text
         
-        shop_name = result.find_element_by_css_selector("p.screen-reader-only").text
-        if shop_name[:2] == 'Ad':
-            is_ad = 1
-        else:
-            is_ad = 0
-        shop_names = shop_name.split(" ")[-1]
-        
-        try:
-            star_rating = result.find_element_by_css_selector("span.screen-reader-only").text
-            star_ratings = star_rating.split(" ")[0]
-        except:
-            star_ratings = np.nan
-        
-        try:
-            num_review = result.find_element_by_css_selector('span.text-body-smaller.text-gray-lighter.display-inline-block.icon-b-1').text
-            num_reviews = num_review.strip("()")
-        except:
-            num_reviews = 0
-        
-        prices = result.find_element_by_css_selector('span.currency-value').text
-            
-        try:    
-            result.find_element_by_xpath("//span[@class='wt-badge wt-badge--small wt-badge--status-03']/span[2]")
-            bestseller = 1
-        except:
-            bestseller = np.nan
-        
-        return titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller
+    try:    
+        result.find_element_by_xpath("//span[@class='wt-badge wt-badge--small wt-badge--status-03']/span[2]")
+        bestseller = 1
+    except:
+        bestseller = np.nan
+    
+    return titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller
+
+def next_page(driver, page_counter):
+    page = driver.find_element_by_xpath('//a[contains(@href,"https://www.etsy.com/uk/search?q=birthday+card&ref=pagination&page={}")]'.format(1+page_counter))
+    next_page = page.get_attribute("href")
+    driver.get(next_page)
     
