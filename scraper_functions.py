@@ -19,11 +19,15 @@ import re
 import pandas as pd 
 import numpy as np 
 
+ 
+
 def get_url_list(search_list):
     url_list = []
+    term_list=[]
     for term in search_list:
         url_list.append('https://www.etsy.com/uk/search?q=' + re.sub("\s", "+", term))
-    return url_list
+        term_list.append(term)
+    return url_list, term_list
     
 def close_popup(driver):
     pop_up_xpath = "//*[@id='gdpr-single-choice-overlay']/div/div[2]/div[2]/button"
@@ -118,7 +122,7 @@ def scrape_link_details(driver,link):
     
      return num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images
 
-def get_main_page(driver, result):
+def get_main_page(driver, result, term):
     
     titles = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
     
@@ -149,7 +153,9 @@ def get_main_page(driver, result):
     except:
         bestseller = np.nan
     
-    return titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller
+    category = term
+    
+    return titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller, category
 
 def next_page(driver, page_counter):
     try:
