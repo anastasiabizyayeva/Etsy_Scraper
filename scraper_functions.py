@@ -81,13 +81,17 @@ def scrape_link_details(driver,link):
         average = start + (end - start)/2
         today = datetime.date.today()
         diff = average.date() - today
-        est_arrival = diff.days
+        days_to_arrival = diff.days
      except:
-        est_arrival = np.nan
+        days_to_arrival = np.nan
     
      try:
         delivery = loaded.find_element_by_xpath("//*[contains(text(), 'Cost to deliver')]/following-sibling::p").text
-        cost_delivery = delivery
+        if delivery == 'Free':
+            cost_delivery = 0
+        else:
+            match = re.search(r'\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})', delivery).group(0)
+            cost_delivery = float(match)
      except:
         cost_delivery = np.nan
     
@@ -112,7 +116,7 @@ def scrape_link_details(driver,link):
      except:
         count_images = 1
     
-     return num_sales, num_basket, descriptions, est_arrival, cost_delivery, returns_accepted, dispatch_from, count_images
+     return num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images
 
 def get_main_page(driver, result):
     
