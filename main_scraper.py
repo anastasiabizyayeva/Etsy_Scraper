@@ -56,7 +56,7 @@ bestseller = []
 num_sales = []
 num_basket = []
 descriptions = []
-est_arrival = []
+days_to_arrival = []
 cost_delivery = []
 returns_accepted = []
 dispatch_from = []
@@ -80,7 +80,7 @@ while page_counter < page_counter_limit:
             
             appenders = scrape_link_details(driver,link)
             
-            mylists = [num_sales, num_basket, descriptions, est_arrival, cost_delivery, returns_accepted, dispatch_from, count_images]
+            mylists = [num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images]
             for x, lst in zip(appenders, mylists):
                 lst.append(x)
             
@@ -122,11 +122,23 @@ while page_counter < page_counter_limit:
         # print(len(num_sales))
         # print(len(num_basket))
         # print(len(descriptions))
-        # print(len(est_arrival))
+        # print(len(days_to_arrival))
         # print(len(cost_delivery))
         # print(len(returns_accepted))
         # print(len(dispatch_from))
         # print(len(count_images))
+        
+        
+        print(num_sales)
+        print(num_basket)
+        print(descriptions)
+        print(days_to_arrival)
+        print(cost_delivery)
+        print(returns_accepted)
+        print(dispatch_from)
+        print(count_images)
+        
+        
         try:
             next_page(driver, page_counter)
         except:
@@ -138,7 +150,7 @@ while page_counter < page_counter_limit:
 
 driver.quit()
 
-data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Est_Arrival': est_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images}
+data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Days_to_Arrival': days_to_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images}
 
 #Create dataframe from our dictionary  
             

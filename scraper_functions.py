@@ -11,6 +11,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from daterangeparser import parse
+import datetime
 import time 
 import re 
 
@@ -61,7 +63,8 @@ def scrape_link_details(driver,link):
         basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
         x = basket[0].text
         y = [int(i) for i in x.split() if i.isdigit()]
-        num_basket = y
+        for i in y:
+            num_basket = i
      except:
         num_basket = 0
     
@@ -73,7 +76,12 @@ def scrape_link_details(driver,link):
     
      try:
         arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
-        est_arrival = arrival.text
+        arrival_range = arrival.text
+        start, end = parse(arrival_range)
+        average = start + (end - start)/2
+        today = datetime.date.today()
+        diff = average.date() - today
+        est_arrival = diff.days
      except:
         est_arrival = np.nan
     
