@@ -13,7 +13,7 @@ import pandas as pd
 import numpy as np
 
 from scraper_functions import open_page, get_url_list, get_links, scrape_link_details, get_main_page, next_page
-from scraper_options import PATH, search_terms
+from scraper_options import PATH, search_terms, page_counter_limit
 
 #Establish path to Chromedriver
 
@@ -64,7 +64,7 @@ count_images = []
 
 #Loop through the scraping code until we get 6000 records
 
-while page_counter < 100:
+while page_counter < page_counter_limit:
         
         #Ensure main search results populate before further action is taken
     
