@@ -110,43 +110,11 @@ for url in urls:
                 except: 
                     break
       
-            print('Finished scraping page ' + str(page_counter))
-            print('Scraped ' + str(record_counter) + ' records')
-            # print(len(count_images) == record_counter)
+            print('Finished scraping page ' + str(page_counter) + ' of "' + terms[term_counter] + '" records.')
+            print('Scraped ' + str(record_counter) + ' records' + ' of "' + terms[term_counter] + '" records.')
+            print('Are all lists equal? ' + str(len(count_images) == record_counter))
                 
             page_counter += 1
-            
-            print(len(titles))
-            print(len(shop_names))
-            print(len(is_ad))
-            print(len(star_ratings))
-            print(num_reviews[70:100])
-            print(len(prices))
-            
-            print(len(num_sales))
-            print(len(num_basket))
-            print(len(descriptions))
-            print(len(days_to_arrival))
-            print(len(cost_delivery))
-            print(len(returns_accepted))
-            print(len(dispatch_from))
-            print(len(count_images))
-            
-            
-            # print(num_sales)
-            # print(num_basket)
-            # print(descriptions)
-            # print(days_to_arrival)
-            # print(cost_delivery)
-            # print(returns_accepted)
-            # print(dispatch_from)
-            # print(count_images)
-            
-            print(len(link_list) == len(results))
-            print(shop_names)
-            
-            print(category)
-            
             
             try:
                 next_page(driver, page_counter)
@@ -156,9 +124,14 @@ for url in urls:
                         
         except:
             break
-            
-    term_counter += 1
+                
     total_records += record_counter
+    
+    print('Finished scraping search term. Total records for ' + terms[term_counter] + ': ' + str(record_counter))
+    print('Total records in scrape: ' + str(total_records))
+    
+    term_counter += 1
+
     
 driver.quit()
 
