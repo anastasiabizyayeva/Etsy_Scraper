@@ -69,7 +69,6 @@ for url in urls:
                 EC.presence_of_element_located((By.ID, 'content')))
             
             link_list = get_links(driver, unique_ids)
-            print(link_list)
             
             #Loop over links and get pertinent information
             
@@ -134,6 +133,8 @@ for url in urls:
             # print(returns_accepted)
             # print(dispatch_from)
             # print(count_images)
+            
+            print(shop_names)
             
             print(category)
             
