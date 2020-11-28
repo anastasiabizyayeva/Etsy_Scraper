@@ -25,6 +25,7 @@ driver = webdriver.Chrome(PATH)
 urls, terms = get_url_list(search_terms)
 
 term_counter = 0
+unique_ids = []
 
 print(terms)
 
@@ -36,7 +37,7 @@ for url in urls:
     record_counter = 0
     num = 0
     
-    link_list = get_links(driver)
+    link_list = get_links(driver, unique_ids)
     #Create empty lists to hold results 
     
     titles = []
@@ -67,7 +68,7 @@ for url in urls:
             main = WebDriverWait(driver,5).until(
                 EC.presence_of_element_located((By.ID, 'content')))
             
-            link_list = get_links(driver)
+            link_list = get_links(driver, unique_ids)
             print(link_list)
             
             #Loop over links and get pertinent information

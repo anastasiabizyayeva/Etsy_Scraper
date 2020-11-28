@@ -41,16 +41,22 @@ def open_page(driver, URL):
     close_popup(driver)
     
 #Find links for each job posted and append them to our links list
-def get_links(driver):
+def get_links(driver, unique_ids):
     
     #Initialize an empty list to hold links to each job search result 
     link_list = []
-    id_check = driver.find_element_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]").get_attribute('data-listing-id')
-    # links = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]/a[1]")
-    # for link in links:
-    #     link_text = link.get_attribute("href")
-    #     link_list.append(link_text)
-    return id_check
+    id_check = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]")
+    for i in id_check:
+        get_id = i.get_attribute('data-listing-id')
+        if get_id not in unique_ids:
+            link = i.find_element_by_xpath(".//a[1]").get_attribute("href")
+            link_list.append(link)
+            unique_ids.append(i)
+        else:
+            next(iter)
+    return link_list
+        
+
 
 def scrape_link_details(driver,link):
      driver.get(link)  
