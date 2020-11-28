@@ -19,8 +19,6 @@ import re
 import pandas as pd 
 import numpy as np 
 
- 
-
 def get_url_list(search_list):
     url_list = []
     term_list=[]
@@ -47,11 +45,12 @@ def get_links(driver):
     
     #Initialize an empty list to hold links to each job search result 
     link_list = []
-    links = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]/a[1]")
-    for link in links:
-        link_text = link.get_attribute("href")
-        link_list.append(link_text)
-    return link_list
+    id_check = driver.find_element_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]").get_attribute('data-listing-id')
+    # links = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]/a[1]")
+    # for link in links:
+    #     link_text = link.get_attribute("href")
+    #     link_list.append(link_text)
+    return id_check
 
 def scrape_link_details(driver,link):
      driver.get(link)  
