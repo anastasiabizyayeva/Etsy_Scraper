@@ -27,7 +27,27 @@ urls, terms = get_url_list(search_terms)
 term_counter = 0
 unique_ids = []
 
-print(terms)
+#Create empty lists to hold results 
+
+titles = []
+shop_names = []
+is_ad = []
+star_ratings = []
+num_reviews = []
+prices = []
+bestseller = []
+category = []
+
+num_sales = []
+num_basket = []
+descriptions = []
+days_to_arrival = []
+cost_delivery = []
+returns_accepted = []
+dispatch_from = []
+count_images = []
+
+total_records = 0
 
 # **WHEN EVERYTHING WORKS IMPLEMENT THIS CODE BELOW/ INDENT**
 for url in urls:
@@ -38,25 +58,6 @@ for url in urls:
     num = 0
     
     link_list = get_links(driver, unique_ids)
-    #Create empty lists to hold results 
-    
-    titles = []
-    shop_names = []
-    is_ad = []
-    star_ratings = []
-    num_reviews = []
-    prices = []
-    bestseller = []
-    category = []
-    
-    num_sales = []
-    num_basket = []
-    descriptions = []
-    days_to_arrival = []
-    cost_delivery = []
-    returns_accepted = []
-    dispatch_from = []
-    count_images = []
     
     #Loop through the scraping code until we get 6000 records
     
@@ -72,21 +73,28 @@ for url in urls:
             
             #Loop over links and get pertinent information
             
-            # for link in link_list:
+            for link in link_list:
                 
-            #     appenders = scrape_link_details(driver,link)
+                appenders = scrape_link_details(driver,link)
                 
-            #     mylists = [num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images]
-            #     for x, lst in zip(appenders, mylists):
-            #         lst.append(x)
+                mylists = [num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images]
+                for x, lst in zip(appenders, mylists):
+                    lst.append(x)
                 
-            #     driver.back()
+                driver.back()
             
             # Get the listing containers and loop through them
             main = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, 'content')))
-    
-            results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
+            
+            results = []
+            
+            options = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
+            for i in options:
+                check_id = i.find_element_by_xpath(".//div").get_attribute('data-listing-id')
+                if check_id not in unique_ids:
+                    unique_ids.append(i)
+                results.append(i)
     
             record_counter += len(results)
                     
@@ -108,21 +116,21 @@ for url in urls:
                 
             page_counter += 1
             
-            # print(len(titles))
-            # print(len(shop_names))
-            # print(len(is_ad))
-            # print(len(star_ratings))
-            # print(num_reviews[70:100])
-            # print(len(prices))
+            print(len(titles))
+            print(len(shop_names))
+            print(len(is_ad))
+            print(len(star_ratings))
+            print(num_reviews[70:100])
+            print(len(prices))
             
-            # print(len(num_sales))
-            # print(len(num_basket))
-            # print(len(descriptions))
-            # print(len(days_to_arrival))
-            # print(len(cost_delivery))
-            # print(len(returns_accepted))
-            # print(len(dispatch_from))
-            # print(len(count_images))
+            print(len(num_sales))
+            print(len(num_basket))
+            print(len(descriptions))
+            print(len(days_to_arrival))
+            print(len(cost_delivery))
+            print(len(returns_accepted))
+            print(len(dispatch_from))
+            print(len(count_images))
             
             
             # print(num_sales)
@@ -134,6 +142,7 @@ for url in urls:
             # print(dispatch_from)
             # print(count_images)
             
+            print(len(link_list) == len(results))
             print(shop_names)
             
             print(category)
@@ -149,16 +158,16 @@ for url in urls:
             break
             
     term_counter += 1
+    total_records += record_counter
     
 driver.quit()
 
-data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Days_to_Arrival': days_to_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images}
+data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Days_to_Arrival': days_to_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images, 'Category': category}
 
 #Create dataframe from our dictionary  
             
 df = pd.DataFrame(data)
 df['Shop_Name'] = df['Shop_Name'].astype('category').cat.codes
-df['Category'] = 'Valentine'
 
 #Save dataframe to a new CSV 
 
