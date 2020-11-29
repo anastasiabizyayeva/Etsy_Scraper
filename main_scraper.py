@@ -65,11 +65,10 @@ for url in urls:
             #Ensure main search results populate before further action is taken
         
         try:
-            main = WebDriverWait(driver,5).until(
+            main = WebDriverWait(driver,10).until(
                 EC.presence_of_element_located((By.ID, 'content')))
             
             link_list = get_links(driver)
-            print(len(link_list))
             
             #Loop over links and get pertinent information
             
@@ -118,27 +117,6 @@ for url in urls:
             except:
                 print('no next page')
                 break
-            
-            
-            print(len(titles))
-            print(len(shop_names))
-            print(len(is_ad))
-            print(len(star_ratings))
-            print(len(num_reviews))
-            print(len(prices))
-            print(len(category))
-            
-            print(len(num_sales))
-            print(len(num_basket))
-            print(len(descriptions))
-            print(len(days_to_arrival))
-            print(len(cost_delivery))
-            print(len(returns_accepted))
-            print(len(dispatch_from))
-            print(len(count_images))
-            print(terms[term_counter])
-            
-            print(descriptions[66])
                                     
         except:
             break

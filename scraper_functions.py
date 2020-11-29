@@ -157,6 +157,7 @@ def get_main_page(driver, result, term):
 
 def next_page(driver, page_counter):
     try:
+        time.sleep(4)
         page = driver.find_element_by_xpath('//a[contains(@data-page,"{}")]'.format(page_counter))
         next_page = page.get_attribute("href")
         driver.get(next_page)
