@@ -9,4 +9,4 @@ PATH = "C:/Program Files (x86)\chromedriver.exe"
 
 search_terms = ['birthday card','valentines card']
 
-page_counter_limit = 2
+page_counter_limit = 3

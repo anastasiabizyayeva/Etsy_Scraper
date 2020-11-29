@@ -25,7 +25,6 @@ driver = webdriver.Chrome(PATH)
 urls, terms = get_url_list(search_terms)
 
 term_counter = 0
-unique_ids = []
 
 #Create empty lists to hold results 
 
@@ -57,7 +56,7 @@ for url in urls:
     record_counter = 0
     num = 0
     
-    link_list = get_links(driver, unique_ids)
+    link_list = get_links(driver)
     
     #Loop through the scraping code until we get 6000 records
     
@@ -69,17 +68,23 @@ for url in urls:
             main = WebDriverWait(driver,5).until(
                 EC.presence_of_element_located((By.ID, 'content')))
             
-            link_list = get_links(driver, unique_ids)
+            link_list = get_links(driver)
+            print(len(link_list))
             
             #Loop over links and get pertinent information
             
             for link in link_list:
                 
-                appenders = scrape_link_details(driver,link)
+                try:
+                    appenders = scrape_link_details(driver,link)
+                    
+                    mylists = [num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images]
+                    
+                    for x, lst in zip(appenders, mylists):
+                        lst.append(x)
                 
-                mylists = [num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images]
-                for x, lst in zip(appenders, mylists):
-                    lst.append(x)
+                except:
+                    break
                 
                 driver.back()
             
@@ -87,21 +92,13 @@ for url in urls:
             main = WebDriverWait(driver, 10).until(
                 EC.presence_of_element_located((By.ID, 'content')))
             
-            results = []
-            
-            options = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
-            for i in options:
-                check_id = i.find_element_by_xpath(".//div").get_attribute('data-listing-id')
-                if check_id not in unique_ids:
-                    unique_ids.append(i)
-                results.append(i)
+            results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
     
             record_counter += len(results)
                     
             for result in results:
                 
                 try:
-                    
                     info = get_main_page(driver, result, terms[term_counter])
                     info_list = [titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller, category]
                     
@@ -110,9 +107,9 @@ for url in urls:
                 except: 
                     break
       
-            print('Finished scraping page ' + str(page_counter) + ' of "' + terms[term_counter] + '" records.')
-            print('Scraped ' + str(record_counter) + ' records' + ' of "' + terms[term_counter] + '" records.')
-            print('Are all lists equal? ' + str(len(count_images) == record_counter))
+            print('Finished scraping page ' + str(page_counter) + ' of "' + terms[term_counter] + '" search term.')
+            print('Scraped ' + str(record_counter) + ' records' + ' of "' + terms[term_counter] + '" search term.')
+            print()
                 
             page_counter += 1
             
@@ -121,14 +118,37 @@ for url in urls:
             except:
                 print('no next page')
                 break
-                        
+            
+            
+            print(len(titles))
+            print(len(shop_names))
+            print(len(is_ad))
+            print(len(star_ratings))
+            print(len(num_reviews))
+            print(len(prices))
+            print(len(category))
+            
+            print(len(num_sales))
+            print(len(num_basket))
+            print(len(descriptions))
+            print(len(days_to_arrival))
+            print(len(cost_delivery))
+            print(len(returns_accepted))
+            print(len(dispatch_from))
+            print(len(count_images))
+            print(terms[term_counter])
+            
+            print(descriptions[66])
+                                    
         except:
             break
                 
     total_records += record_counter
     
-    print('Finished scraping search term. Total records for ' + terms[term_counter] + ': ' + str(record_counter))
+    print('Finished scraping search term. Total records for "' + terms[term_counter] + '": ' + str(record_counter))
     print('Total records in scrape: ' + str(total_records))
+    print('Are all lists equal? ' + str(len(count_images) == total_records))
+    print()
     
     term_counter += 1
 
