@@ -37,7 +37,7 @@ def close_popup(driver):
     
 def open_page(driver, URL):
     driver.get(URL)
-    # time.sleep(4)
+    time.sleep(5)
     close_popup(driver)
     
 #Find links for each job posted and append them to our links list
@@ -53,7 +53,7 @@ def get_links(driver):
 
 def scrape_link_details(driver,link):
      driver.get(link)  
-     loaded = WebDriverWait(driver, 10).until(EC.presence_of_element_located((By.ID, "gnav-search")))
+     loaded = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "gnav-search")))
      try:
         sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
         s = sales[0].text
@@ -157,10 +157,10 @@ def get_main_page(driver, result, term):
 
 def next_page(driver, page_counter):
     try:
-        time.sleep(4)
         page = driver.find_element_by_xpath('//a[contains(@data-page,"{}")]'.format(page_counter))
         next_page = page.get_attribute("href")
         driver.get(next_page)
+        time.sleep(4)
     except:
         pass
     

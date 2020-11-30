@@ -8,6 +8,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.common.exceptions import TimeoutException
+
 import time 
 
 import pandas as pd 
@@ -63,10 +65,16 @@ for url in urls:
     while page_counter < page_counter_limit:
             
             #Ensure main search results populate before further action is taken
-        
-        try:
-            main = WebDriverWait(driver,10).until(
-                EC.presence_of_element_located((By.ID, 'content')))
+        retries = 0
+        while retries <= 5:
+            
+            try:
+                
+                main = WebDriverWait(driver,20).until(
+                    EC.presence_of_element_located((By.ID, 'content')))
+            except TimeoutException:
+                    driver.refresh()
+                    retries += 1
             
             link_list = get_links(driver)
             
@@ -88,8 +96,17 @@ for url in urls:
                 driver.back()
             
             # Get the listing containers and loop through them
-            main = WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.ID, 'content')))
+            
+            retries = 0
+        while retries <= 5:
+            
+            try:
+                
+                main = WebDriverWait(driver,20).until(
+                    EC.presence_of_element_located((By.ID, 'content')))
+            except TimeoutException:
+                    driver.refresh()
+                    retries += 1
             
             results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
     
@@ -108,6 +125,7 @@ for url in urls:
       
             print('Finished scraping page ' + str(page_counter) + ' of "' + terms[term_counter] + '" search term.')
             print('Scraped ' + str(record_counter) + ' records' + ' of "' + terms[term_counter] + '" search term.')
+            print('Are all lists equal? ' + str(len(count_images) == record_counter))
             print()
                 
             page_counter += 1
@@ -117,9 +135,10 @@ for url in urls:
             except:
                 print('no next page')
                 break
-                                    
-        except:
-            break
+            
+            print(len(count_images))
+            print(record_counter)
+            print(len(titles))
                 
     total_records += record_counter
     
@@ -129,6 +148,24 @@ for url in urls:
     print()
     
     term_counter += 1
+    
+            # print(len(titles))
+            # print(len(shop_names))
+            # print(len(is_ad))
+            # print(len(star_ratings))
+            # print(len(num_reviews))
+            # print(len(prices))  
+            # print(len(category))
+    
+            # print(len(num_sales))
+            # print(len(num_basket))
+            # print(len(descriptions))
+            # print(len(days_to_arrival))
+            # print(len(cost_delivery))
+            # print(len(returns_accepted))
+            # print(len(dispatch_from))
+            # print(len(count_images))
+
 
     
 driver.quit()
