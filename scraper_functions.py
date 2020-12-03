@@ -21,6 +21,7 @@ import re
 import pandas as pd 
 import numpy as np 
 
+
 def get_url_list(search_list):
     url_list = []
     term_list=[]
@@ -58,13 +59,13 @@ def open_page(driver, URL):
         raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script#
 # if the script survived this part...# 
     close_popup(driver)
-
+    
 #Find links for each job posted and append them to our links list
 def get_links(driver):
     
     #Initialize an empty list to hold links to each job search result 
     link_list = []
-    links = driver.find_elements_by_xpath("//div[starts-with(@class, 'js-merch-stash-check-listing')]/a[1]")
+    links = driver.find_elements_by_xpath('//a[starts-with(@href, "https://www.etsy.com/uk/listing/")]')
     for link in links:
         link_text = link.get_attribute("href")
         link_list.append(link_text)
@@ -74,19 +75,21 @@ def scrape_link_details(driver,link):
     
     for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
         try: #try the following:#
-          random_sleep_link = random.uniform(1, 3)
+          random_sleep_link = random.uniform(3, 5)
           time.sleep(random_sleep_link)
           
           windows_before  = driver.current_window_handle # Store the parent_window_handle for future use
-          
+          print('got before')
           # driver.get(link)  #access the URL using the header settings defined earlier#
 
           driver.execute_script("window.open('" + link +"');")
+          print('opened window')
           windows_after = driver.window_handles
           new_window = [x for x in windows_after if x != windows_before][0] # Identify the newly opened window
+          print('got new deets')
           driver.switch_to.window(new_window) # switch_to the new window
           
-          loaded = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "gnav-search")))
+          loaded = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "gnav-search")))
           try:
                 sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
                 s = sales[0].text
@@ -152,6 +155,7 @@ def scrape_link_details(driver,link):
                 count_images = 1
           driver.close() # close the window
           driver.switch_to.window(windows_before) # switch_to the parent_window_handle
+          print('switched')
           
         except requests.exceptions.RequestException: #if anything weird happens...#
           random_sleep_except = random.uniform(240,360)
@@ -161,6 +165,7 @@ def scrape_link_details(driver,link):
       
         else: #if the try-part works...#
           break #...break out of the loop#
+          print('broke out of the loop')
 
     else: #if x amount of retries on the try-part don't work...#
         raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script# 

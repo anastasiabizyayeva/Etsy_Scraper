@@ -60,9 +60,7 @@ for url in urls:
     page_counter = 1
     record_counter = 0
     num = 0
-    
-    link_list = get_links(driver)
-    
+        
     #Loop through the scraping code until we get 6000 records
     
     while page_counter < page_counter_limit:
@@ -73,14 +71,14 @@ for url in urls:
             
             try:
                 
-                main = WebDriverWait(driver,5).until(
+                main = WebDriverWait(driver,10).until(
                     EC.presence_of_element_located((By.ID, 'content')))
             except TimeoutException:
                     driver.refresh()
                     retries += 1
             
             link_list = get_links(driver)
-            
+            print(len(link_list))
             #Loop over links and get pertinent information
             
             for link in link_list:
@@ -92,6 +90,8 @@ for url in urls:
                     
                     for x, lst in zip(appenders, mylists):
                         lst.append(x)
+                        
+                    print('success')
                 
                 except:
                     break
