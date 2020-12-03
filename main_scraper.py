@@ -10,6 +10,8 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import TimeoutException
 
+import requests
+import random
 import time 
 
 import pandas as pd 
@@ -52,7 +54,26 @@ total_records = 0
 
 # **WHEN EVERYTHING WORKS IMPLEMENT THIS CODE BELOW/ INDENT**
 for url in urls:
-    open_page(driver, url)
+    
+    for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
+        try: #try the following:#
+          random_sleep_link = random.uniform(10, 15) #sleep for a random chosen amount of seconds between 10 and 15 seconds#
+          time.sleep(random_sleep_link)
+          open_page(driver, url) #access the URL using the header settings defined earlier#
+      
+        except requests.exceptions.RequestException: #if anything weird happens...#
+          random_sleep_except = random.uniform(240,360)
+          print("I've encountered an error! I'll pause for"+str(random_sleep_except/60) + " minutes and try again \n")
+          time.sleep(random_sleep_except) #sleep the script for x seconds and....#
+          continue #...start the loop again from the beginning#
+      
+        else: #if the try-part works...#
+          break #...break out of the loop#
+
+    else: #if x amount of retries on the try-part don't work...#
+        raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script#
+
+# if the script survived this part...# 
     
     page_counter = 1
     record_counter = 0
@@ -70,7 +91,7 @@ for url in urls:
             
             try:
                 
-                main = WebDriverWait(driver,20).until(
+                main = WebDriverWait(driver,5).until(
                     EC.presence_of_element_located((By.ID, 'content')))
             except TimeoutException:
                     driver.refresh()
@@ -97,16 +118,8 @@ for url in urls:
             
             # Get the listing containers and loop through them
             
-            retries = 0
-        while retries <= 5:
-            
-            try:
-                
-                main = WebDriverWait(driver,20).until(
-                    EC.presence_of_element_located((By.ID, 'content')))
-            except TimeoutException:
-                    driver.refresh()
-                    retries += 1
+            main = WebDriverWait(driver, 5).until(
+                EC.presence_of_element_located((By.ID, 'content')))
             
             results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
     
@@ -136,9 +149,9 @@ for url in urls:
                 print('no next page')
                 break
             
-            print(len(count_images))
-            print(record_counter)
-            print(len(titles))
+            # print(len(count_images))
+            # print(record_counter)
+            # print(len(titles))
                 
     total_records += record_counter
     
