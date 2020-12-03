@@ -38,8 +38,25 @@ def close_popup(driver):
         pass
     
 def open_page(driver, URL):
-    driver.get(URL)
-    time.sleep(5)
+    for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
+        try: #try the following:#
+          random_sleep_link = random.uniform(10, 15) #sleep for a random chosen amount of seconds between 10 and 15 seconds#
+          time.sleep(random_sleep_link)
+          driver.get(URL)
+ #access the URL using the header settings defined earlier#
+      
+        except requests.exceptions.RequestException: #if anything weird happens...#
+          random_sleep_except = random.uniform(240,360)
+          print("I've encountered an error! I'll pause for"+str(random_sleep_except/60) + " minutes and try again \n")
+          time.sleep(random_sleep_except) #sleep the script for x seconds and....#
+          continue #...start the loop again from the beginning#
+      
+        else: #if the try-part works...#
+          break #...break out of the loop#
+
+    else: #if x amount of retries on the try-part don't work...#
+        raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script#
+# if the script survived this part...# 
     close_popup(driver)
     
 #Find links for each job posted and append them to our links list

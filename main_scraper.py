@@ -55,25 +55,7 @@ total_records = 0
 # **WHEN EVERYTHING WORKS IMPLEMENT THIS CODE BELOW/ INDENT**
 for url in urls:
     
-    for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
-        try: #try the following:#
-          random_sleep_link = random.uniform(10, 15) #sleep for a random chosen amount of seconds between 10 and 15 seconds#
-          time.sleep(random_sleep_link)
-          open_page(driver, url) #access the URL using the header settings defined earlier#
-      
-        except requests.exceptions.RequestException: #if anything weird happens...#
-          random_sleep_except = random.uniform(240,360)
-          print("I've encountered an error! I'll pause for"+str(random_sleep_except/60) + " minutes and try again \n")
-          time.sleep(random_sleep_except) #sleep the script for x seconds and....#
-          continue #...start the loop again from the beginning#
-      
-        else: #if the try-part works...#
-          break #...break out of the loop#
-
-    else: #if x amount of retries on the try-part don't work...#
-        raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script#
-
-# if the script survived this part...# 
+    open_page(driver,url)
     
     page_counter = 1
     record_counter = 0
