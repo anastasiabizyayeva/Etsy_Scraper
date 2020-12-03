@@ -73,7 +73,7 @@ def get_links(driver):
 def scrape_link_details(driver,link):
     for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
         try: #try the following:#
-          random_sleep_link = 4
+          random_sleep_link = random.uniform(10, 15)
           time.sleep(random_sleep_link)
           driver.get(link)  #access the URL using the header settings defined earlier#
       

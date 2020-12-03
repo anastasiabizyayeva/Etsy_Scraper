@@ -144,22 +144,22 @@ for url in urls:
     
     term_counter += 1
     
-            # print(len(titles))
-            # print(len(shop_names))
-            # print(len(is_ad))
-            # print(len(star_ratings))
-            # print(len(num_reviews))
-            # print(len(prices))  
-            # print(len(category))
+            print(len(titles))
+            print(len(shop_names))
+            print(len(is_ad))
+            print(len(star_ratings))
+            print(len(num_reviews))
+            print(len(prices))  
+            print(len(category))
     
-            # print(len(num_sales))
-            # print(len(num_basket))
-            # print(len(descriptions))
-            # print(len(days_to_arrival))
-            # print(len(cost_delivery))
-            # print(len(returns_accepted))
-            # print(len(dispatch_from))
-            # print(len(count_images))
+            print(len(num_sales))
+            print(len(num_basket))
+            print(len(descriptions))
+            print(len(days_to_arrival))
+            print(len(cost_delivery))
+            print(len(returns_accepted))
+            print(len(dispatch_from))
+            print(len(count_images))
 
 
     
