@@ -73,11 +73,13 @@ for url in urls:
                 
                 main = WebDriverWait(driver,10).until(
                     EC.presence_of_element_located((By.ID, 'content')))
-            except TimeoutException:
+                time.sleep(4)
+            except:
                     driver.refresh()
                     retries += 1
             
             link_list = get_links(driver)
+            link_list = link_list[:65]
             print(len(link_list))
             #Loop over links and get pertinent information
             
