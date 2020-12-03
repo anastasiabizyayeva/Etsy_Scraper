@@ -58,7 +58,7 @@ def open_page(driver, URL):
         raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script#
 # if the script survived this part...# 
     close_popup(driver)
-    
+
 #Find links for each job posted and append them to our links list
 def get_links(driver):
     
@@ -71,12 +71,88 @@ def get_links(driver):
     return link_list
 
 def scrape_link_details(driver,link):
+    
     for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
         try: #try the following:#
-          random_sleep_link = random.uniform(10, 15)
+          random_sleep_link = random.uniform(1, 3)
           time.sleep(random_sleep_link)
-          driver.get(link)  #access the URL using the header settings defined earlier#
-      
+          
+          windows_before  = driver.current_window_handle # Store the parent_window_handle for future use
+          
+          # driver.get(link)  #access the URL using the header settings defined earlier#
+
+          driver.execute_script("window.open('" + link +"');")
+          windows_after = driver.window_handles
+          new_window = [x for x in windows_after if x != windows_before][0] # Identify the newly opened window
+          driver.switch_to.window(new_window) # switch_to the new window
+          
+          loaded = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "gnav-search")))
+          try:
+                sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
+                s = sales[0].text
+                num_sales = s.split(" ")[0]
+          except:
+                num_sales = 0
+                        
+          try:
+                basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
+                x = basket[0].text
+                y = [int(i) for i in x.split() if i.isdigit()]
+                for i in y:
+                    num_basket = i
+          except:
+                num_basket = 0
+            
+          try:
+                description = loaded.find_element_by_xpath("//meta[@name='description']")
+                descriptions = description.get_attribute("content")
+          except:
+                descriptions = np.nan
+            
+          try:
+                arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
+                arrival_range = arrival.text
+                start, end = parse(arrival_range)
+                average = start + (end - start)/2
+                today = datetime.date.today()
+                diff = average.date() - today
+                days_to_arrival = diff.days
+          except:
+                days_to_arrival = np.nan
+            
+          try:
+                delivery = loaded.find_element_by_xpath("//*[contains(text(), 'Cost to deliver')]/following-sibling::p").text
+                if delivery == 'Free':
+                    cost_delivery = 0
+                else:
+                    match = re.search(r'\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})', delivery).group(0)
+                    cost_delivery = float(match)
+          except:
+                cost_delivery = np.nan
+            
+          try:
+                loaded.find_element_by_xpath("//*[contains(text(), 'Accepted')]")
+                returns_accepted = 1
+          except:
+                returns_accepted = 0
+            
+          try:
+                dispatch = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[7]").text
+                d_split = dispatch.split(" ")[2:]
+                d_join = " ".join(d_split)
+                dispatch_from = d_join
+          except:
+                dispatch_from = np.nan
+            
+          try:
+                images = loaded.find_element_by_xpath("//ul[starts-with(@class, 'wt-list-unstyled wt-display-flex-xs')]")
+                i_list = images.find_elements_by_xpath("//li[@class='wt-mr-xs-1 wt-mb-xs-1 wt-bg-gray wt-flex-shrink-xs-0 wt-rounded carousel-pagination-item-v2']")
+                count_images = len(i_list)
+          except:
+                count_images = 1
+          driver.close() # close the window
+          driver.switch_to.window(windows_before) # switch_to the parent_window_handle
+          
         except requests.exceptions.RequestException: #if anything weird happens...#
           random_sleep_except = random.uniform(240,360)
           print("I've encountered an error! I'll pause for"+str(random_sleep_except/60) + " minutes and try again \n")
@@ -88,71 +164,6 @@ def scrape_link_details(driver,link):
 
     else: #if x amount of retries on the try-part don't work...#
         raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script# 
-     
-    loaded = WebDriverWait(driver, 20).until(EC.presence_of_element_located((By.ID, "gnav-search")))
-    try:
-        sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
-        s = sales[0].text
-        num_sales = s.split(" ")[0]
-    except:
-        num_sales = 0
-                
-    try:
-        basket = loaded.find_elements_by_xpath("//p[@class='wt-position-relative wt-text-caption']")
-        x = basket[0].text
-        y = [int(i) for i in x.split() if i.isdigit()]
-        for i in y:
-            num_basket = i
-    except:
-        num_basket = 0
-    
-    try:
-        description = loaded.find_element_by_xpath("//meta[@name='description']")
-        descriptions = description.get_attribute("content")
-    except:
-        descriptions = np.nan
-    
-    try:
-        arrival = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[1]/div/div[1]/p")
-        arrival_range = arrival.text
-        start, end = parse(arrival_range)
-        average = start + (end - start)/2
-        today = datetime.date.today()
-        diff = average.date() - today
-        days_to_arrival = diff.days
-    except:
-        days_to_arrival = np.nan
-    
-    try:
-        delivery = loaded.find_element_by_xpath("//*[contains(text(), 'Cost to deliver')]/following-sibling::p").text
-        if delivery == 'Free':
-            cost_delivery = 0
-        else:
-            match = re.search(r'\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})', delivery).group(0)
-            cost_delivery = float(match)
-    except:
-        cost_delivery = np.nan
-    
-    try:
-        loaded.find_element_by_xpath("//*[contains(text(), 'Accepted')]")
-        returns_accepted = 1
-    except:
-        returns_accepted = 0
-    
-    try:
-        dispatch = loaded.find_element_by_xpath("//*[@id='shipping-variant-div']/div/div[2]/div[7]").text
-        d_split = dispatch.split(" ")[2:]
-        d_join = " ".join(d_split)
-        dispatch_from = d_join
-    except:
-        dispatch_from = np.nan
-    
-    try:
-        images = loaded.find_element_by_xpath("//ul[starts-with(@class, 'wt-list-unstyled wt-display-flex-xs')]")
-        i_list = images.find_elements_by_xpath("//li[@class='wt-mr-xs-1 wt-mb-xs-1 wt-bg-gray wt-flex-shrink-xs-0 wt-rounded carousel-pagination-item-v2']")
-        count_images = len(i_list)
-    except:
-        count_images = 1
     
     return num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images
     
