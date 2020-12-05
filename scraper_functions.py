@@ -44,6 +44,8 @@ def open_page(driver, URL):
           random_sleep_link = random.uniform(10, 15) #sleep for a random chosen amount of seconds between 10 and 15 seconds#
           time.sleep(random_sleep_link)
           driver.get(URL)
+          time.sleep(3)
+          close_popup(driver)
  #access the URL using the header settings defined earlier#
       
         except requests.exceptions.RequestException: #if anything weird happens...#
@@ -58,7 +60,7 @@ def open_page(driver, URL):
     else: #if x amount of retries on the try-part don't work...#
         raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script#
 # if the script survived this part...# 
-    close_popup(driver)
+
     
 #Find links for each job posted and append them to our links list
 def get_links(driver):
@@ -75,13 +77,12 @@ def scrape_link_details(driver,link):
     
     for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
         try: #try the following:#
-          random_sleep_link = random.uniform(3, 5)
+          random_sleep_link = random.uniform(5,7)
           time.sleep(random_sleep_link)
           
           windows_before  = driver.current_window_handle # Store the parent_window_handle for future use
           print('got before')
           # driver.get(link)  #access the URL using the header settings defined earlier#
-
           driver.execute_script("window.open('" + link +"');")
           print('opened window')
           windows_after = driver.window_handles
