@@ -4,6 +4,8 @@ Created on Sun Oct 25 16:24:40 2020
 @author: Anastasia
 """
 
+#Import statements 
+
 from selenium import webdriver 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
@@ -17,6 +19,8 @@ import time
 import pandas as pd 
 import numpy as np
 
+#Import functions and options from other docs 
+
 from scraper_functions import open_page, get_url_list, get_links, scrape_link_details, get_main_page, next_page
 from scraper_options import PATH, search_terms, page_counter_limit
 
@@ -24,9 +28,11 @@ from scraper_options import PATH, search_terms, page_counter_limit
 
 driver = webdriver.Chrome(PATH)
 
-#Establish connection to URLs
+#Establish connection to URLs and get list of terms to search
 
 urls, terms = get_url_list(search_terms)
+
+#Initialize term counter 
 
 term_counter = 0
 
@@ -52,22 +58,29 @@ count_images = []
 
 total_records = 0
 
-# **WHEN EVERYTHING WORKS IMPLEMENT THIS CODE BELOW/ INDENT**
+#Loop through search term URLs 
+
 for url in urls:
+    
+    #Open the URL and close popup
     
     open_page(driver,url)
     
+    #Initialize record and page counters 
+    
     page_counter = 1
     record_counter = 0
-    num = 0
         
-    #Loop through the scraping code until we get 6000 records
+    #Loop through pages in the URL until you reach your desired page limit - note that the Etsy limit is 240
     
     while page_counter < page_counter_limit:
             
-            #Ensure main search results populate before further action is taken
+        #Implement retry loop to prevent IP block stalling 
+        
         retries = 0
         while retries <= 5:
+            
+            #Wait until page loads search contents before scraping 
             
             try:
                 
@@ -78,9 +91,14 @@ for url in urls:
                     driver.refresh()
                     retries += 1
             
+            #Get a list of links to individual listings
+            
             link_list = get_links(driver)
+            
+            #We only want to keep first 65 links because the rest are your 'recently viewed' links 
+            
             link_list = link_list[:65]
-            print(len(link_list))
+            
             #Loop over links and get pertinent information
             
             for link in link_list:
@@ -92,14 +110,10 @@ for url in urls:
                     
                     for x, lst in zip(appenders, mylists):
                         lst.append(x)
-                        
-                    print('success')
-                
+                                        
                 except:
                     break
-                
-                # driver.back()
-            
+                            
             # Get the listing containers and loop through them
             
             main = WebDriverWait(driver, 5).until(
