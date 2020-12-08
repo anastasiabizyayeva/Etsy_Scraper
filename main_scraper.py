@@ -162,7 +162,7 @@ for url in urls:
             # print(len(returns_accepted))
             # print(len(dispatch_from))
             # print(len(count_images))
-
+        
             # print(titles[7:8])
             # print(descriptions[7:8])
 
@@ -176,6 +176,9 @@ data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': s
 df = pd.DataFrame(data)
 df['Shop_Name'] = df['Shop_Name'].astype('category').cat.codes
 
+df1 = pd.read_csv('raw_data.csv')
+
+df_all = np.concatenate((df1, df), axis=0)
 #Save dataframe to a new CSV 
 
-df.to_csv('raw_data.csv')
+df_all.to_csv('raw_data_2.csv')
