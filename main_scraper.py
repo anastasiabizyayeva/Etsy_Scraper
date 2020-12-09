@@ -119,10 +119,16 @@ for url in urls:
             main = WebDriverWait(driver, 5).until(
                 EC.presence_of_element_located((By.ID, 'content')))
             
+            #Get only the first 65 listing containers - the rest are your 'recently viewed' items 
+            
             results = main.find_elements_by_xpath('//li[starts-with(@class, "wt-list-unstyled wt-grid__item-xs-6 wt-grid__item-md-4 wt-grid__item")]')[:65]
-    
+            
+            #Add the results you've scraped to your record counter 
+            
             record_counter += len(results)
                     
+            #Loop over each listing and get its details 
+            
             for result in results:
                 
                 try:
@@ -133,66 +139,57 @@ for url in urls:
                         lst.append(x)
                 except: 
                     break
-      
+                
+            #For each page, print out a statement telling you how many pages have been scraped, how many records have been scraped, and whether all scraped categories are equal. 
+            
             print('Finished scraping page ' + str(page_counter) + ' of "' + terms[term_counter] + '" search term.')
             print('Scraped ' + str(record_counter) + ' records' + ' of "' + terms[term_counter] + '" search term.')
             print('Are all lists equal? ' + str(len(count_images) == record_counter))
             print()
-                
+            
+            #Add one to the page count 
+            
             page_counter += 1
+            
+            #Click into the next page 
             
             try:
                 next_page(driver, page_counter)
             except:
                 print('no next page')
                 break
-            
-            # print(len(count_images))
-            # print(record_counter)
-            # print(len(titles))
-                
+
+    #Get the total record count
+    
     total_records += record_counter
+    
+    #Print the total number of records scraped for this term, as well as the total records overall. 
     
     print('Finished scraping search term. Total records for "' + terms[term_counter] + '": ' + str(record_counter))
     print('Total records in scrape: ' + str(total_records))
     print('Are all lists equal? ' + str(len(count_images) == total_records))
     print()
     
+    #Add one to the term counter so the next term is scraped
+    
     term_counter += 1
-    
-            # print(len(titles))
-            # print(len(shop_names))
-            # print(len(is_ad))
-            # print(len(star_ratings))
-            # print(len(num_reviews))
-            # print(len(prices))  
-            # print(len(category))
-    
-            # print(len(num_sales))
-            # print(len(num_basket))
-            # print(len(descriptions))
-            # print(len(days_to_arrival))
-            # print(len(cost_delivery))
-            # print(len(returns_accepted))
-            # print(len(dispatch_from))
-            # print(len(count_images))
-        
-            # print(titles[7:8])
-            # print(descriptions[7:8])
 
-    
+# Close driver 
+
 driver.quit()
+
+#Create a dict from our lists 
 
 data = {'Title': titles, 'Shop_Name':shop_names,'Is_Ad': is_ad, 'Star_Rating': star_ratings, 'Num_Reviews': num_reviews, 'Price': prices, 'Is_Bestseller': bestseller, 'Num_Sales': num_sales, 'Num_Basket': num_basket, 'Description': descriptions, 'Days_to_Arrival': days_to_arrival, 'Cost_Delivery': cost_delivery, 'Returns_Accepted': returns_accepted, 'Dispatched_From': dispatch_from, 'Num_Images': count_images, 'Category': category}
 
 #Create dataframe from our dictionary  
             
 df = pd.DataFrame(data)
+
+#Anonymize the shop names 
+
 df['Shop_Name'] = df['Shop_Name'].astype('category').cat.codes
 
-df1 = pd.read_csv('raw_data.csv')
-
-df_all = np.concatenate((df1, df), axis=0)
 #Save dataframe to a new CSV 
 
-df_all.to_csv('raw_data_2.csv')
+df.to_csv('raw_data.csv')
