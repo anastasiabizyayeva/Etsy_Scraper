@@ -7,7 +7,6 @@ Created on Tue Oct 27 17:10:33 2020
 
 #Import all packages
 
-from selenium import webdriver 
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
@@ -17,12 +16,11 @@ import requests
 import random
 import time 
 import re 
-
-import pandas as pd 
 import numpy as np 
 
-
 def get_url_list(search_list):
+    """Gets a list of URLs for Etsy and a list of terms to append to the 'category' column from an input of a list of search term strings. Spaces will be accounted for.   
+    """
     url_list = []
     term_list=[]
     for term in search_list:
@@ -31,41 +29,38 @@ def get_url_list(search_list):
     return url_list, term_list
     
 def close_popup(driver):
+    """Closes the 'privacy settings' popup on the homepage of search results. Takes the Chromdriver as an input.   
+    """
     pop_up_xpath = "//*[@id='gdpr-single-choice-overlay']/div/div[2]/div[2]/button"
     try:
         driver.find_element_by_xpath(pop_up_xpath).click()
-        # time.sleep(2)
     except:
         pass
     
 def open_page(driver, URL):
-    for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
-        try: #try the following:#
-          random_sleep_link = random.uniform(10, 15) #sleep for a random chosen amount of seconds between 10 and 15 seconds#
+    """Opens a webpage given a driver and a URL. This function uses the 'close_popup' function to get past the privacy setting popup. It also accounts for potential IP blocks by sleeping for a random amount of time between 10 and 15 seconds with each page opened.   
+    """
+    for i in range(3): 
+        try: 
+          random_sleep_link = random.uniform(10, 15)
           time.sleep(random_sleep_link)
           driver.get(URL)
           time.sleep(3)
           close_popup(driver)
- #access the URL using the header settings defined earlier#
       
-        except requests.exceptions.RequestException: #if anything weird happens...#
+        except requests.exceptions.RequestException: 
           random_sleep_except = random.uniform(240,360)
           print("I've encountered an error! I'll pause for"+str(random_sleep_except/60) + " minutes and try again \n")
-          time.sleep(random_sleep_except) #sleep the script for x seconds and....#
-          continue #...start the loop again from the beginning#
-      
-        else: #if the try-part works...#
-          break #...break out of the loop#
+          time.sleep(random_sleep_except) 
+          continue 
+        else: 
+          break 
+    else: 
+        raise Exception("Something really went wrong here... I'm sorry.") 
 
-    else: #if x amount of retries on the try-part don't work...#
-        raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script#
-# if the script survived this part...# 
-
-    
-#Find links for each job posted and append them to our links list
 def get_links(driver):
-    
-    #Initialize an empty list to hold links to each job search result 
+    """This function finds all of the links to listings on an Etsy page and returns a list composed of the text of the href attribute. It takes your webdriver as an input.
+    """
     link_list = []
     links = driver.find_elements_by_xpath('//a[starts-with(@href, "https://www.etsy.com/uk/listing/")]')
     for link in links:
@@ -74,23 +69,21 @@ def get_links(driver):
     return link_list
 
 def scrape_link_details(driver,link):
-    
-    for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
-        try: #try the following:#
+    """Opens a link to a listing and scrapes all of the pertinent details. Returns 1) the number of sales made by the shop, 2) the number of this item currently in people's baskets, 3) the description of the item, 4) the average number of days between today and when the item arrives, 5) the cost of delivery, 6) whether returns are accepted, 7) the country where the item is dispatched from, and 8) how many images the listing has.   
+    """
+    for i in range(3): 
+        try: 
           random_sleep_link = random.uniform(5,7)
           time.sleep(random_sleep_link)
-          
-          windows_before  = driver.current_window_handle # Store the parent_window_handle for future use
-          print('got before')
-          # driver.get(link)  #access the URL using the header settings defined earlier#
+          windows_before  = driver.current_window_handle 
           driver.execute_script("window.open('" + link +"');")
           print('opened window')
           windows_after = driver.window_handles
-          new_window = [x for x in windows_after if x != windows_before][0] # Identify the newly opened window
+          new_window = [x for x in windows_after if x != windows_before][0]
           print('got new deets')
-          driver.switch_to.window(new_window) # switch_to the new window
-          
+          driver.switch_to.window(new_window) 
           loaded = WebDriverWait(driver, 5).until(EC.presence_of_element_located((By.ID, "gnav-search")))
+          
           try:
                 sales = loaded.find_elements_by_xpath("//div[starts-with(@class, 'wt-display-inline-flex-xs wt-align-items-center')]/a/span[1]")
                 s = sales[0].text
@@ -174,7 +167,8 @@ def scrape_link_details(driver,link):
     return num_sales, num_basket, descriptions, days_to_arrival, cost_delivery, returns_accepted, dispatch_from, count_images
     
 def get_main_page(driver, result, term):
-    
+    """Scrapes the details of the search page. This function takes 3 arguments as inputs: 1) your webdriver, 2) the location of the contents area of the Etsy search page, and 3) the search term you're currently scrubbing for. It returns 65 object lists for each of the following: 1) titles of the listings, 2) whether the listings are ads, 3) the names of the listing shops, 3) the star rating of the shops, 4) the number of reviews the shops have, 5) the prices of the objects, 6) whether the listings are bestsellers, and 7) the category of the search (which will be the term you've input)  
+    """
     titles = result.find_element_by_css_selector("div > a[href]").get_attribute("title")
     
     shop_name = result.find_element_by_css_selector("p.screen-reader-only").text
@@ -209,27 +203,26 @@ def get_main_page(driver, result, term):
     return titles, is_ad, shop_names, star_ratings, num_reviews, prices, bestseller, category
 
 def next_page(driver, page_counter):
+    """Clicks on the next page of search results. Takes the webdriver and current page_counter as arguments to ensure the right next page is located.  
+    """
     try:
         page = driver.find_element_by_xpath('//a[contains(@data-page,"{}")]'.format(page_counter))
         next_page = page.get_attribute("href")
         
-        for i in range(3): # loop the try-part (i.e. opening the link) until it works, but only try it 4 times at most#
-            try: #try the following:#
+        for i in range(3): 
+            try: 
               random_sleep_link = 4
               time.sleep(random_sleep_link)
-              driver.get(next_page) #access the URL using the header settings defined earlier#
-          
-            except requests.exceptions.RequestException: #if anything weird happens...#
+              driver.get(next_page) 
+            except requests.exceptions.RequestException:
               random_sleep_except = random.uniform(240,360)
               print("I've encountered an error! I'll pause for"+str(random_sleep_except/60) + " minutes and try again \n")
-              time.sleep(random_sleep_except) #sleep the script for x seconds and....#
-              continue #...start the loop again from the beginning#
-          
-            else: #if the try-part works...#
-              break #...break out of the loop#
-    
-        else: #if x amount of retries on the try-part don't work...#
-            raise Exception("Something really went wrong here... I'm sorry.") #...raise an exception and stop the script# 
+              time.sleep(random_sleep_except) 
+              continue
+            else: 
+              break 
+        else: 
+            raise Exception("Something really went wrong here... I'm sorry.") 
     except:
         pass
     
